@@ -1,0 +1,23 @@
+CREATE TABLE IF NOT EXISTS `shopping_cart` (
+	`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+	`fid` INT UNSIGNED NOT NULL,
+	`name` VARCHAR(64) NOT NULL DEFAULT '',
+	`unit_price` DECIMAL(11,2) NOT NULL, 
+	`cnt` INT UNSIGNED NOT NULL default 0,
+	`total_price` DECIMAL(11,2) NOT NULL,
+	`uid` INT UNSIGNED NOT NULL
+) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin ENGINE INNODB;
+
+SELECT `id`,`fid`,`name`,`unit_price` AS `unitPrice`,`cnt`,`total_price` AS `totalPrice`,`uid`
+		FROM `shopping_cart`;
+		
+INSERT INTO `shopping_cart`
+		VALUE
+		(NULL, 14, '摆设1', 5000, 3, 15000, 3);
+		
+UPDATE `shopping_cart` 
+		SET `name` = '摆设1EX',`unit_price` = 4000,`cnt` = `cnt` + 1,`total_price` = 20000
+		WHERE `uid` = 3;
+		
+DROP TABLE shopping_cart;
+TRUNCATE TABLE shopping_cart;

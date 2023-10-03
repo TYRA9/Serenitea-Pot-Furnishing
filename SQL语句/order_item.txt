@@ -1,0 +1,14 @@
+CREATE TABLE IF NOT EXISTS `order_item`(
+	`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+	`name` VARCHAR(64) NOT NULL DEFAULT '',
+	`unit_price` DECIMAL(11,2) NOT NULL, 
+	`cnt` INT UNSIGNED NOT NULL default 0,
+	`total_price` DECIMAL(11,2) NOT NULL,
+	`order_number` VARCHAR(64) NOT NULL
+) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin ENGINE INNODB;
+
+SELECT `id`,`name`,`unit_price` AS `unitPrice`,`cnt`,`total_price` AS `totalPrice`,`order_number` AS `orderNumber` FROM `order_item` WHERE `order_number` = '16956931730981';
+
+DROP TABLE `order_item`;
+
+TRUNCATE TABLE `order_item`;

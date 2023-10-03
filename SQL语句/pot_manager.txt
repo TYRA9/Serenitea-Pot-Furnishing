@@ -1,0 +1,11 @@
+CREATE TABLE IF NOT EXISTS `pot_manager` (
+	`id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+	`username` VARCHAR(32) NOT NULL DEFAULT '',
+	`password` CHAR(32) NOT NULL DEFAULT ''
+) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin ENGINE INNODB;
+
+INSERT INTO `pot_manager`(`username`, `password`)
+		VALUES
+		('Cyan', MD5('RA9Cyan'));
+
+SELECT `id`,`username`,`password` FROM `pot_manager`;

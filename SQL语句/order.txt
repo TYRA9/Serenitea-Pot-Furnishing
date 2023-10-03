@@ -1,0 +1,13 @@
+CREATE TABLE IF NOT EXISTS `order`(
+		`number` VARCHAR(64) PRIMARY KEY,
+		`date_time` DATETIME NOT NULL,
+		`sums` DECIMAL(11,2) NOT NULL,	# 此处金额的字段类型应与之前shopping_cart表的类型保持一致
+		`status` TINYINT NOT NULL, 			# 0表示未发货，1表示已发货
+		`uid` INT UNSIGNED NOT NULL
+) CHARACTER SET utf8mb3 COLLATE utf8mb3_bin ENGINE INNODB;
+
+SELECT `number`,`date_time` AS `dateTime`,`sums`,`status`,`uid` FROM `order`;
+
+DROP TABLE `order`;
+
+TRUNCATE TABLE `order`;
