@@ -1,3 +1,6 @@
+![4](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/23099c37-44f0-4647-8eca-7954190d98e5)
+
+
 web项目——尘歌壶摆设购买系统(Serenitea-Pot-Furnishing)，采用原生Servlet + JSP完成开发，用到了HTML+CSS+JS, JSON, Tomcat, Servlet, JSP, EL+JSTL, Session, Filter, JQuery, Ajax等内容。    
 
 **PS1: 项目十大功能————(_功能演示及具体的实现思路见下文_)**  
@@ -174,7 +177,56 @@ ___
 
 ## 5.首页展示摆设 : 
 ### 5.1 演示
+  　　web工程启动后，会自动跳转到首页，如下图所示 : 
+			![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/0ff65e0d-76cd-48eb-b117-83c2b4998dad)  
+  　　首页要求分页展示。  
+  　　若检测到用户未登录，首页仅提供"Log in|Sign up"，并且操作购物车时会自动跳转到用户登录页面；若用户已登录，则显示Order Admin和Log out功能模块。
 
 ### 5.2 实现思路  
+  　　表及domain : 不需要新建新的表，使用furnishing表。  
+  　　DAO层，Service层及Web用到的API与“首页搜索功能”高度重合，可以说是“首页兼容”功能兼容了"首页展示"的功能。  
+  　　下文见"首页搜索"的演示及实现思路。
 
+## 6.首页搜索摆设 : 
+### 6.1 演示
+  　　首页搜索摆设关键词，可以找到指定的摆设，如下图所示 :   
+  　　![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/c0e44cb8-5fc4-4055-90f5-98f32239e94f)  
+  　　![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/650cdec4-a02f-46ca-ab31-0492385b9b3f)
 
+### 6.2 实现思路  
+  　　表及domain : 不需要新建新的表，使用furnishing表。  
+  　　DAO层 : FurnishingDAOImpl类，在后台管理"摆设分页展示"用到的获取总的记录条数的getRecordSum方法和获取展示记录的getPageItems方法的基础上，另外定义getRecordSumByName方法和getPageItemsByName方法，顾名思义，就是在原来这俩方法的基础上，增加对name的校验————即增加LIKE模糊查询。另外，第五个功能“首页展示”，底层也要用到这俩个方法;因此，需要在WHERE子句中增加对stock库存的校验，要求`stock` > 0。  
+  　　Service层 : FurnishingServiceImpl类，区别于getPage方法，另外定义一个getPageByName方法，相比于getPage方法要多传入一个形参name，即用户在首页搜索摆设时从表单input输入的值。Service层的getPageByName方法，自然会调用到DAO层的getRecordSumByName和getPageItemsByName方法，但是整体上和getPage方法几无二致。  
+  　　Web层 : 区别于面向管理员的实现“摆设后台管理”的FurnishingServlet，由于“首页展示”和“首页搜素”都只针对于普通用户的，因此此处要另外定义一个PresentToUsersServlet类，用于完成首页的分页展示(包括了搜索结果的分页展示),PresentToUsersServlet类依然要继承自BasicServlet类。在PresentToUsersServlet类中定义一个pagingByName方法，通过req对象获取请求参数中的name，注意，若传入的参数携带有name但没有值，接收到的name = ""，若传入的参数没有携带name，接收到的name = null；利用 if 条件语句，将name = ""和name = null的两种情况合并起来，使得两种情况下的name均为""，根据DAO层sql语句中模糊查询的特点，name=""，相当于%%，会返回所有的摆设，从而实现了“首页分页展示”和“首页搜索”两个功能共用一个方法。构造一个StringBuilder类型的字符串表示url，若name不为""，就通过append方法在url中追加name；设置page对象的url属性，请求转发到首页index.jsp。如下图所示 : 
+			![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/b14ac14d-7816-46f3-8c9d-a4633567e834)  
+  　　前端 : 隐藏真正的首页index.jsp，在web包下另定义一个index.jsp用作入口页面，使用JSTL请求转发标签转发到真正的隐藏起来的首页index.jsp,如下图所示 :   
+			![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/841ef3c3-3fce-419d-bd57-f94d733e9d8f)  
+  　　通过EL表达式取出Page对象的url属性，即可实现首页的分页导航。注意，“首页展示”和“首页搜索”功能下，该url的值是不同的，区别就是那个name。  
+  　　此外，前端要通过JQuery为分页导航按钮绑定事件，防止“页码越界”和“无效点击”。  
+  　　在“首页搜索”的表单中，通过hidden类型的input标签提交pageNumber,rows和action。  
+		
+## 7.用户退出 : 
+### 7.1 演示
+  　　在首页点击Log Out,会跳出确认弹窗，如下 :   
+			![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/1331b9c8-20cf-450f-afce-c0bbcdc62172)
+  　　退出成功后会跳转回首页，如下 ：  
+			![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/ef31f6ea-f9d2-4bc4-80c6-aa1f79fb4f37)  
+	 
+### 7.2 实现思路  
+  　　表及domain : 不需要新建表，使用pot_user表即可。  
+  　　DAO层 : 只是退出网站的登录状态，并不是删除用户，因此PotUserDAOImpl无变化。  
+  　　Service层 : 没有涉及到直接与用户本身相关的业务，即没有直接对用户操作，因此PotServiceImpl无变化。  
+  　　Web层 : 定义一个logout方法，在该方法中，首先令当前的session会话立刻无效，然后请求重定向到首页即可。
+				
+## 8.购物车管理 ——（展示，添加，修改，删除，清空） : 
+### 8.1 演示
+  　　鼠标悬浮到首页的图片上，会显示“Add to Cart”按钮，点击可以将商品添加到购物车，如下图所示 :   
+			![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/b9bd5d62-c695-4b19-85e6-292ced2a33ee)  
+  　　点击首页的Shopping Cart，可以查看自己的购物车，如下图所示 :   
+			![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/0017f2d3-d747-4f6f-94ec-ba5bed86b64f)  
+  　　在购物车界面可以对购物车中的任意商品进行修改或删除操作，如下图所示 :   
+			![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/e781bf5b-36ed-459c-8d15-1bef1dfc04d2)  
+  　　购物车界面的左下角会实时的显示当前购物车中总共的商品种数，以及总共的价格，点击右下角的"CLEAR ALL"可以清空购物车。如下：  
+			![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/081fb7e2-d036-4c38-aa37-10b99a31add5)
+
+### 8.2 实现思路
