@@ -1,3 +1,4 @@
+**提示 : 点击README.md文件(该文件)左上角的目录图案(三个点过来三条杠)————可以查看文章目录。**
 ![4](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/23099c37-44f0-4647-8eca-7954190d98e5)
 
 
@@ -194,12 +195,16 @@ ___
   　　![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/650cdec4-a02f-46ca-ab31-0492385b9b3f)
 
 ### 6.2 实现思路  
-  　　表及domain : 不需要新建新的表，使用furnishing表。  
-  　　DAO层 : FurnishingDAOImpl类，在后台管理"摆设分页展示"用到的获取总的记录条数的getRecordSum方法和获取展示记录的getPageItems方法的基础上，另外定义getRecordSumByName方法和getPageItemsByName方法，顾名思义，就是在原来这俩方法的基础上，增加对name的校验————即增加LIKE模糊查询。另外，第五个功能“首页展示”，底层也要用到这俩个方法;因此，需要在WHERE子句中增加对stock库存的校验，要求`stock` > 0。  
-  　　Service层 : FurnishingServiceImpl类，区别于getPage方法，另外定义一个getPageByName方法，相比于getPage方法要多传入一个形参name，即用户在首页搜索摆设时从表单input输入的值。Service层的getPageByName方法，自然会调用到DAO层的getRecordSumByName和getPageItemsByName方法，但是整体上和getPage方法几无二致。  
-  　　Web层 : 区别于面向管理员的实现“摆设后台管理”的FurnishingServlet，由于“首页展示”和“首页搜素”都只针对于普通用户的，因此此处要另外定义一个PresentToUsersServlet类，用于完成首页的分页展示(包括了搜索结果的分页展示),PresentToUsersServlet类依然要继承自BasicServlet类。在PresentToUsersServlet类中定义一个pagingByName方法，通过req对象获取请求参数中的name，注意，若传入的参数携带有name但没有值，接收到的name = ""，若传入的参数没有携带name，接收到的name = null；利用 if 条件语句，将name = ""和name = null的两种情况合并起来，使得两种情况下的name均为""，根据DAO层sql语句中模糊查询的特点，name=""，相当于%%，会返回所有的摆设，从而实现了“首页分页展示”和“首页搜索”两个功能共用一个方法。构造一个StringBuilder类型的字符串表示url，若name不为""，就通过append方法在url中追加name；设置page对象的url属性，请求转发到首页index.jsp。如下图所示 : 
+  　　**表及domain :**   
+  　　不需要新建新的表，使用furnishing表。  
+  　　**DAO层 :** FurnishingDAOImpl类，在后台管理"摆设分页展示"用到的获取总的记录条数的getRecordSum方法和获取展示记录的getPageItems方法的基础上，另外定义getRecordSumByName方法和getPageItemsByName方法，顾名思义，就是在原来这俩方法的基础上，增加对name的校验————即增加LIKE模糊查询。另外，第五个功能“首页展示”，底层也要用到这俩个方法;因此，需要在WHERE子句中增加对stock库存的校验，要求`stock` > 0。  
+  　　**Service层 :**   
+  　　FurnishingServiceImpl类，区别于getPage方法，另外定义一个getPageByName方法，相比于getPage方法要多传入一个形参name，即用户在首页搜索摆设时从表单input输入的值。Service层的getPageByName方法，自然会调用到DAO层的getRecordSumByName和getPageItemsByName方法，但是整体上和getPage方法几无二致。  
+  　　**Web层 :**  
+  　　区别于面向管理员的实现“摆设后台管理”的FurnishingServlet，由于“首页展示”和“首页搜素”都只针对于普通用户的，因此此处要另外定义一个PresentToUsersServlet类，用于完成首页的分页展示(包括了搜索结果的分页展示),PresentToUsersServlet类依然要继承自BasicServlet类。在PresentToUsersServlet类中定义一个pagingByName方法，通过req对象获取请求参数中的name，注意，若传入的参数携带有name但没有值，接收到的name = ""，若传入的参数没有携带name，接收到的name = null；利用 if 条件语句，将name = ""和name = null的两种情况合并起来，使得两种情况下的name均为""，根据DAO层sql语句中模糊查询的特点，name=""，相当于%%，会返回所有的摆设，从而实现了“首页分页展示”和“首页搜索”两个功能共用一个方法。构造一个StringBuilder类型的字符串表示url，若name不为""，就通过append方法在url中追加name；设置page对象的url属性，请求转发到首页index.jsp。如下图所示 : 
 			![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/b14ac14d-7816-46f3-8c9d-a4633567e834)  
-  　　前端 : 隐藏真正的首页index.jsp，在web包下另定义一个index.jsp用作入口页面，使用JSTL请求转发标签转发到真正的隐藏起来的首页index.jsp,如下图所示 :   
+  　　**前端 :**  
+  　　隐藏真正的首页index.jsp，在web包下另定义一个index.jsp用作入口页面，使用JSTL请求转发标签转发到真正的隐藏起来的首页index.jsp,如下图所示 :   
 			![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/841ef3c3-3fce-419d-bd57-f94d733e9d8f)  
   　　通过EL表达式取出Page对象的url属性，即可实现首页的分页导航。注意，“首页展示”和“首页搜索”功能下，该url的值是不同的，区别就是那个name。  
   　　此外，前端要通过JQuery为分页导航按钮绑定事件，防止“页码越界”和“无效点击”。  
@@ -230,3 +235,34 @@ ___
 			![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/081fb7e2-d036-4c38-aa37-10b99a31add5)
 
 ### 8.2 实现思路
+  　　**表及domain :**  
+  　　设计将购物车中的数据保存到数据库中，新建一张shopping_cart表用于存储所有的购物车数据。使用fid(摆设id),和uid(用户id)来唯一确定shopping_cart表中的一项条目。shopping_cart表字段的设计如下图所示 :   
+    	![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/784f9346-4f98-480d-996f-3901b10bfdfb)  
+  　　对应的JavaBean类定义为CartItem，表示购物车中某一具体的条目。  
+  　　**DAO层 :**  
+  　　购物车展示———— ShoppingCartDAOImpl类中定义一个queryCartItemsByUid方法，该方法根据uid返回指定用户所有的购物车条目。  
+  　　购物车添加———— 由于用户在首页面添加购物车时会出现两种情况————(1)之前没添加过该商品，第一次添加；(2)已经添加过该商品，不是第一次添加；因此ShoppingCartDAOImpl类中也要根据这两种情况定义不同的方法。对于(1)情况，定义addCartItem方法，INSERT INTO语句完成表的添加操作；对于(2)情况，定义updateCartItem方法，通过UPDATE语句完成表的修改操作，注意，此处的updateCartItem中的SQL语句写成了固定格式————即数量 = 数量 + 1,总价 = 总价 + 单价；因为updateCartItem只是为首页重复添加商品而服务的，所以采用了“逐次增1”的思想，并不等同于“摆设修改”的方法。  
+  　　购物车修改———— 定义updateCntAndTotalPrice方法，当用户在购物车中修改指定商品的数量时，底层会根据该方法，修改op数据库shopping_cart表中对应条目的cnt和total_price字段；还需要定义一个querySpecificCartItemByFidAndUid方法，该方法的目的是为了取出数据库shopping_cart表中要修改的条目，返回一个临时的CartItem对象，利用了"**取出--修改--放入--再取出**"的思想。  
+  　　购物车删除———— 定义deleteCartItem方法，根据传入的fid和uid删除shopping_cart表中唯一对应的购物车条目。  
+  　　购物车清空———— 定义deleteAllCartItems方法，根据传入的uid删除指定用户的所有购物车条目，即清空指定用户的购物车。  
+  　　**Service层 :**  
+  　　购物车展示———— Service层调用DAO层，返回List<CartItem>类型。  
+  　　购物车添加———— Service层调用DAO层，传入CartItem cartItem, Integer uid两个形参。首先通过querySpecificCartItemByFidAndUid方法判断该条目是否已经在购物车中了，如果是，就调用DAO层的updateCartItem方法对该商品进行“逐个增1”，如果不是，就调用DAO层的addCartItem方法，将新的条目添加到shopping_cart表中。  
+  　　购物车修改———— Service层调用DAO层，updateCntAndTotalPrice方法需要传入CartItem cartItem, Integer uid两个形参。  
+  　　购物车删除———— Service层调用DAO层，传入Integer fid, Integer uid用以确定shopping_cart表中唯一的条目。  
+  　　购物车清空———— Service层调用DAO层，传入uid即可。  
+  　　**Web层 :**  
+  　　购物车展示———— 在ShoppingCartServlet类中定义一个showCart方法，首先获取请求参数中的uid，判断当前是否有用户正确登录，如果没有，就请求重定向到用户登录页面login.jsp;若用户已经正确登录，Web层调用Service层的queryCartItemsByUid方法，得到当前用户购物车中的所有数据List<CartItem>，然后放入session域中，此外，还需要遍历拿到的List<CartItem>，计算出该用户购物车中所有商品的总价totalPrice,也放入到session域中，此举是为了给前端页面能够即时显示购物车中总的商品的价格。  
+  　　购物车添加———— 仍然使用Apache提供的工具类BeanUtils完成对数据的封装，通过CartItem对象的uid属性判断用户是否正常登录，若没有，则请求重定向到用户登录页面;若已经合法登录，Web层调用Service层的addCartItem(cartItem, cartItem.getUid())方法，完成购物车的添加。此外，首页在点击“Add to Cart”添加商品时，还需要将pageNumber和rows通过请求参数的方式传入ShoppingCartServlet，ShoppingCartServlet通过/presentToUsersServlet的分页方法pagingByName，使得用户在第几页添加到商品，添加后就停留在第几页。  
+  　　购物车修改———— 不多说，利用了"**取出--修改--放入--再取出**"的思想，直接看代码，注意要更新session域中的cartItems和totalPrice属性。  
+  　　购物车删除———— Web层调用Service层，传入Integer fid, Integer uid删除唯一确定的条目，删除成功后，请求重定向到showCart方法。  
+  　　购物车清空———— Web层调用Service层，传入uid即可，清空后，请求重定向到showCart方法。  
+  　　**前端 :**  
+  　　购物车展示———— 使用JSTL遍历cartItems集合，循环显示摆设；通过List集合的size方法，获取当前购物车中总的条目数；通过已经放入到session域中的totalPrice属性，获取当前购物车中总的价格。  
+  　　购物车添加———— 在首页index.jsp中，通过<a>标签包裹<button>标签的形式，发出HTTP请求。  
+  　　购物车修改———— 利用前端代码，将js文件中的一部分代码拷贝过来加以利用(将前端js文件中对应的源码注释掉)，获取购物车中摆设的实时数量cnt，然后通过location.href=发出HTTP请求。  
+  　　购物车删除———— 通过JQuery绑定点击事件，确认用户是否删除。  
+  　　购物车清空———— 通过JQuery绑定点击事件，确认用户是否清空。  
+## 9.订单管理 : 
+### 9.1 演示
+
