@@ -72,7 +72,7 @@ ___
   MVC思想在WEB层的应用如下图所示 : 
     ![C_web层MVC具体情况](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/c95cd733-ee81-4451-9383-9e1e3c168457)
 
-# 功能演示及具体实现
+# 二、功能演示及具体实现
 ## 1.用户注册 : 
 ### 1.1 演示
   当前pot_user表中有8位用户，如下图所示 : (PS : 管理员也可以作为普通用户登录，只不过登录窗口不同。)  
@@ -168,7 +168,7 @@ ___
 	**(4) Web层 ：**   
   　　摆设展示————Web层调用Service层，定义paging方法，获取请求参数中的pageNumber和rows，然后调用Service层的getPage方法得到page对象；将page对象放入到request域中，然后请求转发到摆设管理页面furn_manage.jsp。  
   　　摆设添加————使用Apache的BeanUtils来完成数据的封装,调用Service层的addFurnishing方法完成摆设的添加；furn_manage.jsp的Add超链接将最后一页的页码传入，以实现“添加摆设”后自动跳转到最后一页(通过请求参数中的pageNumber属性，请求重定向到用于分页展示的paging方法)。  
-  　　摆设修改————较为复杂。首先需要listSpecificOne方法用于给管理员回显要修改的摆设的数据，将要修改的摆设对象放入到request域中，然后请求转发到furn_update页面；其次，当管理员提交修改操作时，调用需update方法。要用户“文件上传与下载”的三个jar包。首先根据id获取到要修改的摆设对象，该对象是一个临时对象，为了达到“取出--修改--放入--再取出”的目的；通过API得到表单提交的数据的集合，然后遍历获取到的集合，如果是文本类型，就一一判断各自是什么文本类型，通过Furnishing对象的setter方法修改对应的属性；如果是文件类型，说明要修改摆设的图片，创建目录，写入文件，然后修改furnishing对象的imgPath属性。[**尤其要注意路径相关的问题**]，最后，在通过调用Service层的updateFurnishing方法，完成对数据库中数据的更改，和摆设添加同理，也要通过请求参数获取当前的pageNumber，然后请求重定向到用于分页展示的paging方法，不过同摆设添加时不一样的是，摆设修改后要停留在修改摆设的那一页。  
+  　　摆设修改————较为复杂。首先需要listSpecificOne方法用于给管理员回显要修改的摆设的数据，将要修改的摆设对象放入到request域中，然后请求转发到furn_update页面；其次，当管理员提交修改操作时，调用需update方法。要用户“文件上传与下载”的三个jar包。首先根据id获取到要修改的摆设对象，该对象是一个临时对象，为了达到“取出--修改--放入--再取出”的目的；通过文件上传与下载jar包中的一套API得到表单提交的数据的集合，然后遍历获取到的集合，如果是文本类型，就一一判断各自是什么文本类型，通过Furnishing对象的setter方法修改对应的属性；如果是文件类型，说明要修改摆设的图片，创建目录，写入文件，然后修改furnishing对象的imgPath属性。[**尤其要注意路径相关的问题**]，最后，在通过调用Service层的updateFurnishing方法，完成对数据库中数据的更改，和摆设添加同理，也要通过请求参数获取当前的pageNumber，然后请求重定向到用于分页展示的paging方法，不过同摆设添加时不一样的是，摆设修改后要停留在修改摆设的那一页。  
   　　摆设删除————通过id删除指定摆设，删除成功后，请求重定向到删除时所在分页。    
  	**(5) 前端 ：**  
   　　摆设展示————每一分页都通过JSTL的<c:foreach>标签循环展示request域中的page对象的items属性中保存的摆设；使用分页导航实现分页展示的功能，借助JSTL的<c:choose>标签，通过算法控制显示的页数。  
@@ -265,4 +265,65 @@ ___
   　　购物车清空———— 通过JQuery绑定点击事件，确认用户是否清空。  
 ## 9.订单管理 : 
 ### 9.1 演示
+  　　在购物车中，点击"CHECKOUT"即可进行结账，如下图所示：  
+  　　![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/6ffc22af-bdb7-4023-8474-242192ee68bf)  
+  　　若当前购物车中没有添加任何商品，点击结账会提示信息，如下图所示 :  
+  　　![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/92483b4a-737b-4811-b82d-9d78f5a11af8)  
+  　　结账成功后，会生成唯一订单号，如下：  
+  　　![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/4d78aac1-705e-40b5-a23d-d2b9520bb31b)  
+  　　点击订单号/Order Admin，会跳转到订单管理页面(管理员可以查看所有用户的订单，普通用户只能查看自己的所有订单)，如下所示:  
+  　　![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/48315fa0-b663-4623-9799-c4d01462dda8)  
+  　　可以查看每个订单的详情页，详情页会显示当前订单包含了哪些商品，如下图所示 :   
+  　　![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/6650a179-0d36-4412-9e19-3a59b25cb212)  
+### 9.2 实现思路
+  　　**表及domain :**  
+  　　设计两张表：order和order_item,order表用户存储所有的订单信息，因此，order表显然要包括uid，number,date_time这些字段；order_item，见名知意，用以保存订单中的所有订单项，除了商品信息相关的字段外，显然还要包括order_number字段。PS：为保证性能，未设置外键约束。  
+  　　定义对应的JavaBean类Order和OrderItem。  
+  　　“订单管理”的实现有一个特点———定义的OrderDAOImpl和OrderItemDAOImpl两个DAO，仅服务于OrderServiceImpl一个Service，不再定义其他Service。  
+  　　**DAO层 :**  
+  　　生成订单———— OrderDAOImpl类中定义saveOrder(Order order)方法，用以将生成的订单的数据保存到op数据库中的order表中；对应地，OrderItemDAOImpl类中要定义saveOrderItem(OrderItem orderItem)方法，用以将每一个订单项数据保存到op数据库中的order_item表中。  
+  　　显示订单———— OrderDAOImpl类中分别定义queryAllOrders()和queryOrdersByUid(Integer uid)两个方法，分别用于管理员查看所有用户的订单 和 普通用户查看自己的订单；OrderItemDAOImpl由于与订单本身并无直接关系，因此不需要定义方法。  
+  　　订单详情———— OrderItemImpl类中定义queryOrderItems(String orderNumber)方法，根据传入的订单编号orderNumber从数据库中的order_item表查询该编号对应的订单的所有订单项信息，返回List<OrderItem>类型。  
+  　　**Service层 :**  
+  　　生成订单———— OrderServiceImpl中要同时调用4个DAO，这是因为“生成订单”相当于购买成功了，所以“生成订单”的方法要同时涉及order,order_item,furnishing,shopping_cart四张表；Service层调用DAO层，定义saveOrder(BigDecimal sums, List<CartItem> cartItems, Integer uid)方法，该方法要同时完成四件事情：(1)生成一张订单，并将该订单保存到order表中 (2)将生成订单的全部订单项，依次保存到order_item表中 (3)修改furnishing表中对应的sales和stock (4)清空当前用户的购物车(需要操作到shopping_cart表)，该方法最终要返回生成订单的订单号.  
+  　　对于如何生成订单，首先要获取一个唯一的订单编号，使用System.currentTimeMillis() + "" + uid拼接的形式，然后调用DAO层的saveOrder方法；遍历传入的List集合，通过调用DAO层的saveOrderItem方法，在遍历的同时将每一项保存到order_item方法中；通过furnishingDAO.queryFurnishingById(cartItem.getFid())得到当前商品在furnishing表中的对应的记录，数据保存到Furnishing对象中，通过setter方法修改sales和stock字段的值，然后再调用furnishingDAO.updateFurnishing(furnishing)将修改操作提交到数据库中；最后在遍历结束后，调用shoppingCartDAO.deleteAllCartItems(uid)清空当前用户的购物车。  
+  　　显示订单———— Service层调用DAO层。  
+  　　订单详情———— Service层调用DAO层。  
+  　　**Web层 :**  
+  　　生成订单———— Web层调用Service层，在OrderServlet中定义saveOrder方法，获取session域中的totalPrice,cartItems,和PotUser属性，并对它们进行后端的校验；将返回的订单编号放入到session域中，并请求重定向到checkout.jsp页面。  
+  　　显示订单———— 普通用户在checkout.jsp页面点击订单号后发出HTTP请求访问OrderServlet的showMyOrders方法，该方法将获取到的订单的集合放入到request域中，并请求转发到order.jsp。  
+  　　订单详情———— showOrderItems方法如下图所示 :  
+  　　![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/44ae4aed-5c6a-4f06-bf96-702cfb0e5004)  
+  　　该方法请求转发到order_detail.jsp页面。  
+  　　**前端 :**  
+  　　生成订单———— 用户在购物车页面结账时，进行前端校验，防止生成空订单；OrderServlet的saveOrder方法生成订单后，进入checkout.jsp页面，通过EL表达式取出session域中的订单编号orderNumber。  
+  　　显示订单———— 利用JSTL的<c:if>标签，判断request域中是否存在mgrId属性，以此来判断发出请求的是普通用户还是管理员；如果mgrId存在，显示所有用户的订单，反之，仅显示当前用户的订单。同时，菜单栏也要利用JSTL的<c:if>标签，判断是普通用户还是管理员，显示不同的功能，如下图所示 :  
+  　　![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/61d3909b-6f44-4c25-b169-fd8399a799e9)。  
+  　　订单详情———— 菜单栏的功能变化及实现与order.jsp同理；通过EL表达式取出request域中保存的orderItems,totalPrice。  
+
+## 10.上传更新摆设图片 : 
+### 10.1 演示
+  　　在furn_update.jsp页面中，  
+			![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/53c29e41-d309-457a-b689-3d8a31709491)  
+  　　选择文件后，提交即可更新摆设图片，如下所示:  
+  　　![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/1b0b7c1e-98ca-48eb-981d-de869bdbd972)
+### 10.2 实现思路
+  　　(1)在furn_update页面增加关于上传文件的css/js代码。  
+  　　(2)修改furn_update页面中的提交表单(新增enctype属性;将img标签使用div包起来，在该div中增加一个之前用过的type=file的input标签)
+  　　  　　(去除hidden标签，直接追加到url后)  
+  　　(3)更新FurnishingServlet中的update方法(因为前端表单中修改了enctype属性为multipart/form-data，因此不能再使用BeanUtils进行数据的封装)
+  　　  　　[update方法中就是正常"上传文件"的代码]  
+  　　(4)同之前“修改摆设”一样，修改后要跳转到修改前所在的页面(包括分页页码也要一致)  
+  　　(5)若发现管理员在修改摆设时没有上传新的图片，就不对摆设图片作处理。  
+  　　PS : 以代码实践为主。
+# 三、项目优化
+## 1.配置过滤器  
+  　　在web.xml配置文件中配置两个过滤器(PotManagerFilter和PotUserFilter，分别用来拦截对后台管理页面和用户前台页面的非法访问。注意，对于两个登录页面要给予放行)
+## 2.操作数据库的事务控制  
+  　　事务管理是为了确保数据库中表的数据的一致性。  
+  　　(1)对JDBCUtilsDruid工具类进行升级，增加private static ThreadLocal<Connection> threadLocalConn = new ThreadLocal<>();属性。新定义一个获取连接的方法，该方法先从ThreadLocal中获取连接，如果判断该连接为空，就从连接池中获取一个连接，紧接着开启一个事务，然后将该连接放入到ThreadLocal中进行绑定，保证每次访问数据库时从连接池获取的连接都是同一个。再单独定义一个提交事务的方法commit，通过Connection封装好的commit方法进行事务的提交，commit后，需要调用threadLocalConn.remove()方法把threadLocal中绑定的connection数据清除掉，这是因为Tomcat底层使用线程池技术，若一个连接长期被ThreadLocal持有，会影响运行效率。单独定义一个rollback方法用于回滚，通过Connection封装好的rollback方法进行事务的回滚。  
+  　　(2)JDBCUtilsDruid工具类中的commit和rollback方法中已经关闭连接，所以可以撤掉BasicDAO中关闭连接的部分。  
+  　　(3)另定义过滤器TransactionFilter，利用Filter的特性(最后执行后置代码)，完成事务控制:  
+  　　![image](https://github.com/TYRA9/Serenitea-Pot-Furnishing/assets/99473764/c0870f6b-9ddc-4714-bbbe-7b0aba4c695c)  
+  　　
 
